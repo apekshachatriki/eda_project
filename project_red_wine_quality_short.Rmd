@@ -1,0 +1,1102 @@
+---
+title: "Project - Red Wine Quality by Apeksha Chatriki"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+========================================================
+
+## R Markdown
+## Read the csv file
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, warning=FALSE, message=FALSE)
+```
+
+```{r echo=FALSE}
+rwq <- read.csv('wineQualityReds.csv')
+head(rwq)
+```
+
+The csv file has been read and saved to a dataframe. The first 5 rows have been printed above.
+
+## Looking for a summary of each column, its structure and names of all columns
+
+```{r echo=FALSE}
+summary(rwq)
+str(rwq)
+names(rwq)
+```
+
+The above output for summary gives us statistics like mean, mediam and various quartiles of all columns in the red wine quality data. The quartile values gives us interesting information on which columns could contain outliers. An outlier is considered to be present if a point is 1.5 times of the interquartile range more than the 3rd quartile or less than the 1st quartile. The columns containing outliers based on this calculation are: 
+
+residual.sugar
+free.sulfur.dioxide
+total.sulfur.dioxide
+fixed.acidity
+chlorides
+sulphates
+
+The str command showed me the kind of data(datatype) stored in each column and also sample values in each column.
+The names command gives me names of all the columns. I can always use this command to refer to column names if I am not able to recollect them during my project.
+
+Now, I would like to check if we have any factored variables in our data.
+
+## Check for factor variables 
+
+```{r echo=FALSE}
+is.fact <- sapply(rwq, is.factor)
+is.fact
+```
+
+Turns out, none of the columns are factored variables.
+
+## Install ggplot2
+
+```{r echo=FALSE}
+##install.packages('ggplot2',repos = "http://cran.us.r-project.org")
+library(ggplot2)
+```
+
+## Study the nature of each column
+
+
+## Quality
+
+```{r echo=FALSE}
+qplot(x = quality, 
+      data = subset(rwq,!is.na(quality)))
+ggplot(rwq, aes(x=factor(quality))) + geom_bar()
+```
+
+Quality is not a continuous variable. I first tried to plot it using the qplot and I figured that using the ggplot function makes it look much better and does not mislead us into thinking that it is a continuous variable like the other columns.
+
+## Residual Sugar(with outliers)
+
+```{r echo=FALSE}
+qplot(x = residual.sugar, 
+      data = subset(rwq,!is.na(residual.sugar)))
+```
+
+## Residual Sugar(without outliers)
+
+```{r echo=FALSE}
+qplot(x = residual.sugar, 
+      data = subset(rwq,!is.na(residual.sugar))) + 
+      scale_x_log10() +
+      scale_x_continuous(lim = c(0,10), breaks = seq(0,10,0.5))
+```
+
+Adding a scale_x_log10() made the distribution look a lot better. Also, limiting the data to to be in between 0g/dm^3 and 10g/dm^3, and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+## Alcohol
+
+```{r echo=FALSE}
+qplot(x = alcohol, 
+      data = subset(rwq,!is.na(alcohol)))
+```
+
+Alcohol column has pretty much a normal distribution and no outliers to be worried about.
+
+## Fixed Acidity(with outliers)
+
+```{r echo=FALSE}
+qplot(x = fixed.acidity, 
+      data = subset(rwq,!is.na(fixed.acidity)))
+```
+
+## Fixed Acidity(without outliers)
+
+```{r echo=FALSE}
+qplot(x = fixed.acidity,
+      data = subset(rwq,!is.na(fixed.acidity))) +
+      scale_x_continuous(lim = c(4,13), breaks = seq(4,13,1))
+```
+
+Limiting the data to to be in between 4g/dm^3 and 13g/dm^3, and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+## Volatile Acidity
+
+```{r echo=FALSE}
+qplot(x = volatile.acidity, 
+      data = subset(rwq,!is.na(volatile.acidity)))
+```
+
+Volatile acidity column has pretty much a normal distribution and no outliers to be worried about.
+
+## Citric Acid
+
+```{r echo=FALSE}
+qplot(x = citric.acid, 
+      data = subset(rwq,!is.na(citric.acid)))
+```
+
+Alcohol column has a distribution which is slightly skewed to the right but no outliers to be worried about.
+
+## Chlorides(with outliers)
+
+```{r echo=FALSE}
+qplot(x = chlorides, 
+      data = subset(rwq,!is.na(chlorides)))
+```
+
+## Chlorides(without outliers)
+```{r echo=FALSE}
+qplot(x = chlorides, 
+      data = subset(rwq,!is.na(chlorides))) +
+      scale_x_log10() +
+      scale_x_continuous(lim = c(0.05,0.2), breaks = seq(0.05,0.2,0.01))
+```
+
+Adding a scale_x_log10() made the distribution look a lot better. Also limiting the data to to be in between 0.05g/dm^3 and 0.2g/dm^3, and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+## Density
+
+```{r echo=FALSE}
+qplot(x = density, 
+      data = subset(rwq,!is.na(density)))
+```
+
+Density column has pretty much a normal distribution and no outliers to be worried about.
+
+## pH
+
+```{r echo=FALSE}
+qplot(x = pH, 
+      data = subset(rwq,!is.na(pH)))
+```
+
+pH column has pretty much a normal distribution and no outliers to be worried about.
+
+## Sulphates(with outliers)
+
+```{r echo=FALSE}
+qplot(x = sulphates, 
+      data = subset(rwq,!is.na(sulphates)))
+```
+
+## Sulphates(without outliers)
+
+```{r echo=FALSE}
+qplot(x = sulphates, 
+      data = subset(rwq,!is.na(sulphates))) +
+      scale_x_continuous(lim = c(0.25,1.25), breaks = seq(0.25,1.25,0.25))
+```
+
+Limiting the data to be in between 0.25g/dm^3 and 1.25g/dm^3, and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+## Free Sulphur Dioxide(with outliers)
+
+```{r echo=FALSE}
+qplot(x = free.sulfur.dioxide, 
+      data = subset(rwq,!is.na(free.sulfur.dioxide)))
+```
+
+## Free Sulphur Dioxide(without outliers)
+```{r echo=FALSE}
+qplot(x = free.sulfur.dioxide, 
+      data = subset(rwq,!is.na(free.sulfur.dioxide))) +
+      scale_x_continuous(lim = c(0,50), breaks = seq(0,50,5))
+```
+
+Limiting the data to less than 50mg/dm^3 and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+## Total Sulfur Dioxide(with outliers)
+
+```{r echo=FALSE}
+qplot(x = total.sulfur.dioxide, 
+      data = subset(rwq,!is.na(total.sulfur.dioxide)))
+```
+
+## Total Sulfur Dioxide(without outliers)
+
+```{r echo=FALSE}
+qplot(x = total.sulfur.dioxide, 
+      data = subset(rwq,!is.na(total.sulfur.dioxide))) +
+      scale_x_continuous(lim = c(0,150), breaks = seq(0,150,10))
+```
+
+Limiting the data to less than 150mg/dm^3 and adding the right breaks makes this data look more readable and also gets rid of the outliers when compared to the original data.
+
+What do we do next?
+
+The quality column looks like the one which could be measured against a lot of other properties of wine. It looks like 5,6 and 7 are the most popular values for the quality rating of the wine.
+
+## Study of quality against other properties of red wine(without handling outliers)
+
+## Quality with Alcohol
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = alcohol), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+There seems to be some sort of a linear relationship between alcohol and quality.
+
+## Quality with residual sugar
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = residual.sugar), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = residual.sugar), data = rwq) + 
+  scale_y_log10() +
+  scale_y_continuous(lim = c(0,10), breaks = seq(2,10,0.5)) +
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. Even though the data is more spread out, there isn't any obvious trend visible above.
+
+##Quality with Total Sulfur Dioxide
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = total.sulfur.dioxide), data = rwq) +
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = total.sulfur.dioxide), data = rwq) +
+      scale_y_continuous(lim = c(0,150), breaks = seq(0,150,10)) +
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. There seems to be some sort of a linear relationship between total sulfur dioxide and quality.
+
+## Quality with free sulfur dioxide
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = free.sulfur.dioxide), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = free.sulfur.dioxide), data = rwq) +
+      scale_y_continuous(lim = c(0,50), breaks = seq(0,50,5)) + 
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. There is no obvious trend visible above between free sulfur dioxide and quality.
+
+## Quality with citric acid
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = citric.acid), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+There seems to be some sort of a linear relationship between alcohol and quality but it is not very obvious.
+
+## Quality with fixed acidity
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = fixed.acidity), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = fixed.acidity), data = rwq) +
+      scale_y_continuous(lim = c(4,13), breaks = seq(4,13,1)) + 
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. There is no obvious trend visible above between fixed acidity and quality.
+
+## Quality with volatile acidity
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = volatile.acidity), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+There seems to be some sort of a linear relationship between volatile acidity and quality.
+
+## Quality with pH
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = pH), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+There is no obvious trend visible above between pH and quality.
+
+## Quality with chlorides
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = chlorides), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = chlorides), data = rwq) +
+      scale_y_log10() +
+      scale_y_continuous(lim = c(0.05,0.2), breaks = seq(0.05,0.2,0.01)) + 
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. There is no obvious trend visible above between chlorides and quality.
+
+## Quality with sulphates
+
+```{r echo=FALSE}
+ggplot(aes(x = quality , y = sulphates), data = rwq) + 
+  geom_point(alpha = 1/10, position = position_jitter(h = 0))
+ggplot(aes(x = quality , y = sulphates), data = rwq) +
+      scale_y_continuous(lim = c(0.25,1.25), breaks = seq(0.25,1.25,0.25)) + 
+      geom_point(alpha = 1/10, position = position_jitter(h = 0))
+```
+
+The first plot is the original data and the second one is after removing outiers. There seems to be some sort of a linear relationship between volatile acidity and quality.
+
+Upon removing outliers, the data is more spread out and clear but not all columns show trends with the red wine quality. The data trends too are better seen upon removing outliers. 
+The quality of red wine against all the other characteristics shows that some columns seem to have a linear relationship with quality. They are alcohol, sulphates, volatile acidity and citric acid. The relationship is not very clear and obvious though. The data needs to be looked at from some other angle to be sure.
+
+How could I transform the data so that it is easier to read?
+
+I think, if I group the values of each of these characteristics and plot them against quality, I might be able to see a trend with increasing or decreasing values of each characteristic with wine quality. I need to perform functions like group by to do this.
+
+## Installing the required packages to perform functions like groupby, filter etc.
+
+```{r echo=FALSE}
+install.packages('dplyr',repos = "http://cran.us.r-project.org")
+library(dplyr)
+```
+
+I have my dplyr package installed and I will first start with grouping quality values, find a mean or median value of alcohol for each quality group and plotting them against each other. If this looks like it could give me helful information, I will do the same for the other characteristics. 
+
+## Grouping alcohol values by quality
+
+```{r echo=FALSE}
+rwq.alc_by_quality <- rwq %>%
+  group_by(quality) %>%
+  summarize(mean_alcohol = mean(alcohol),
+  median_alcohol = median(alcohol),
+  n = n()) %>%
+  ungroup()
+
+ggplot(aes(median_alcohol,quality), data = rwq.alc_by_quality) + 
+  geom_point() + geom_smooth() +
+  labs(x = "Alcohol", y = "Quality")
+```
+
+This gives me a dataset 6 rows with the mean and median alcohol value for each quality rating and the number of records in each group(n). It does show some trend as per the plot, it looks like higher quality ratings are associated with higher alcohol values. But I think I should try the other way round to see a more detailed picture. I will group quality values by alcohol values later.
+
+Now, since I see a trend which is quite easy to understand how alcohol affects the wine quality, I will try the same for the rest of the properties.
+
+## Grouping all other characteristics by quality to see a direct impact
+
+I initially thought that I would calculate mean and median and then choose one of them to plot against quality but I think that I should just use median. Mean can be kind of misleading because of the outliers.
+
+```{r echo=FALSE}
+rwq.other_characteristics_by_quality <- rwq %>%
+  group_by(quality) %>%
+  summarize(
+  median_fixed_acidity = median(fixed.acidity),
+  median_volatile_acidity = median(volatile.acidity),
+  median_citric_acid = median(citric.acid),
+  median_residual_sugar = median(log10(residual.sugar)),
+  median_chlorides = median(log10(chlorides) + 1),
+  median_free_sulfure_dioxide = median(free.sulfur.dioxide),
+  median_total_sulfure_dioxide = median(total.sulfur.dioxide),
+  median_density = median(density),
+  median_ph = median(pH),
+  median_sulpahtes = median(sulphates),
+  n = n()) %>%
+  ungroup()
+```
+
+I just created one big table containing all the median values for each of the chemical characterictic for each value of wine quality. I will then use the single table to pull out one chemical characterictic at a time and plot them against the quality values.
+
+I will use a scatterplot for each and smoothen them out.
+
+## Median of fixed acidity with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_fixed_acidity,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() +
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Fixed Acidity", y = "Quality")
+```
+
+There is a positive linear relationship fixed acidity has with wine quality. The quality of wine increases with increase in median values of fixed acidity. Although looks like it stabilizes after a point.
+
+## Median of volatile acidity with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_volatile_acidity,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() +
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Volatile Acidity", y = "Quality")
+```
+
+There is a strong negative linear relationship volatile acidity has with wine quality. The quality of wine decreases with increase in median values of volatile acidity.
+
+## Median of citric acid with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_citric_acid,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Citric Acid", y = "Quality")
+```
+
+There is some sort of a positive linear relationship citric acid has with wine quality. The quality of wine increases gradually with increase in median values of citric acid.
+
+## Median of residual sugar with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_residual_sugar,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() +
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Residual Sugar", y = "Quality")
+```
+
+The data points are all scattered showing that there is no evident relationship between residual sugar and wine quality.
+
+## Median of chlorides with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_chlorides,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Chlorides", y = "Quality")
+```
+
+There is a gradual decrease in quality with increase in chloride amount. The relationship is not very strong though as the smooth line goes up and down.
+
+## Median of free sulfur dioxide with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_free_sulfure_dioxide,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Free Sulfur Dioxide", y = "Quality")
+```
+
+The data points are all scattered showing that there is no evident relationship between free sulfur dioxide and wine quality.
+
+## Median of total sulfur dioxide with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_total_sulfure_dioxide,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Total Sulfur Dioxide", y = "Quality")
+```
+
+The data points are all scattered showing that there is no evident relationship between total sulfur dioxide and wine quality.
+
+## Median of density with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_density,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Density", y = "Quality")
+```
+
+The data points are all scattered showing that there is no evident relationship between density and wine quality.
+
+## Median of pH with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_ph,quality), 
+      data = rwq.other_characteristics_by_quality) + geom_point() + 
+      geom_smooth() + 
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "pH", y = "Quality")
+```
+
+There is a gradual decrease in quality with increase in pH. Its not a steep decline so we cannot really say that there is a negative linear relationship. But surely there is a little bit of a trend.
+
+## Median of sulphates with quality
+
+```{r echo=FALSE}
+ggplot(aes(median_sulpahtes,quality), 
+       data = rwq.other_characteristics_by_quality) + geom_point() + 
+       geom_smooth() + 
+       scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+       labs(x = "Sulphates", y = "Quality")
+```
+
+There is a gradual increase in quality of wine with increase in sulphates. There is a positive linear relationship.  
+
+Some characteristics have a linear relationship whereas some plots are hard to read or deduce any kind of relationship.
+
+Citric Acid and Sulphates have a positive linear relationship, the quality seems to gradually increase with increase in each of these properties. The relationship between Fixed Acidity and Quality too has somewhat of a positive linear kind of relationship.
+
+Volatile Acidity, Chlorides and pH have a negative linear relationship. Density too showa little bit of negative linear relationship but it is not very strong.
+
+## Grouping alcohol values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+alcohol_groups <- group_by(rwq, alcohol)
+
+rwq.quality_by_alc <- summarise(alcohol_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(alcohol,mean_quality), data = rwq.quality_by_alc) + 
+  geom_point() + geom_smooth()
+```
+
+This is noisier data but it gives more data points than that of the plots created before this. The above plot does show that with increase in alcohol content, the quality seems to be gradually increasing. We do see a fall to the extreme right of the graph, this maybe the case with extremely high amount of alcohol(>14%), people do not really enjoy drinking this wine. If we had some more data in this region, we can tell better.
+
+I would like to do the same with the other characteristics to see if something intersting comes up.
+
+## Grouping residual.sugar values to see the relation between their mean and quality of wine
+
+Residual sugar has outliers, so I will filter that data out before transforming it.
+
+```{r echo=FALSE}
+##Remove outliers before transforming data
+rwq_res_sugar_without_outlier <- subset(rwq,log10(residual.sugar) < 10)
+res_sugar_groups <- group_by(rwq_res_sugar_without_outlier, residual.sugar)
+
+rwq.quality_by_res_sugar <- summarise(res_sugar_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(residual.sugar,mean_quality), 
+       data = subset(rwq.quality_by_res_sugar,residual.sugar < 10)) + 
+       geom_point() + geom_smooth() 
+```
+
+As seen with residual.sugar in the set of graphs earlier, there is no trend as such seen with quality. Majority of the values seem to be seen within the 5 and 6 quality range.
+
+## Grouping fixed.acidity values to see the relation between their mean and quality of wine
+Fixed acidity has outliers, so I will filter that data out before transforming it.
+
+```{r echo=FALSE}
+##Remove outliers before transforming data
+rwq_fixd_acidity_without_outlier <- subset(rwq,fixed.acidity < 13)
+fixed_acidity_groups <- group_by(rwq_fixd_acidity_without_outlier, fixed.acidity)
+
+rwq.quality_by_fixed_acidity <- summarise(fixed_acidity_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(fixed.acidity,mean_quality), data = rwq.quality_by_fixed_acidity) + geom_point() + geom_smooth()
+```
+
+With fixed.acidity, it looks like there is a small dip in quality but then after the fixed acidity crosses 7.5, the quality seems to be gradually increasing. So we can say that there is a relationship but it is not very strong.
+
+## Grouping volatile.acidity values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+volatile_acidity_groups <- group_by(rwq, volatile.acidity)
+
+rwq.quality_by_volatile_acidity <- summarise(volatile_acidity_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(volatile.acidity,mean_quality), 
+       data = rwq.quality_by_volatile_acidity) + 
+  geom_point() + geom_smooth()
+```
+
+Volatile acidity clearly has a negative linear relationship with the quality of wine. The gradient shows that people are not a big fan of wine which have greater contents of volatile acidity.
+
+## Grouping total.sulfur.dioxide values and free.sulfur.dioxide values to see the relation between their mean and quality of wine
+
+Both total and free sulfur dioxide have outliers, so I will filter that data out before transforming it.
+
+```{r echo=FALSE}
+##Remove outliers before transforming data
+rwq_tot_sulf_dioxide_without_outlier <- subset(rwq,total.sulfur.dioxide < 150)
+tot_sulf_dioxide_groups <- group_by(rwq_tot_sulf_dioxide_without_outlier, total.sulfur.dioxide)
+
+rwq.quality_by_tot_sulf_dioxide <- summarise(tot_sulf_dioxide_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(total.sulfur.dioxide,mean_quality), 
+       data = rwq.quality_by_tot_sulf_dioxide) + 
+  geom_point() + geom_smooth()
+
+##Remove outliers before transforming data
+rwq_free_sulf_dioxide_without_outlier <- subset(rwq,free.sulfur.dioxide < 50)
+free_sulf_dioxide_groups <- group_by(rwq_free_sulf_dioxide_without_outlier, free.sulfur.dioxide)
+
+rwq.quality_by_free_sulf_dioxide <- summarise(free_sulf_dioxide_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(free.sulfur.dioxide,mean_quality), 
+       data = rwq.quality_by_free_sulf_dioxide) + 
+  geom_point() + geom_smooth()
+```
+
+Total sulfur dioxide too has a negative linear relationship with the quality of wine. There are a lot of data points where the total sulfur dioxide is between 100 and 150 and the mean quality is down at 5 and on the other side there are lot of data points where the mean quality is above 5 where the total sulfur dioxide is less than 100.
+
+With free sulfur dioxide, there is a negative linear relationship but it is not very strong. There is a very gradual dip in quality with increase in free sulfur dioxide.
+
+## Grouping citric.acid values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+citric_acid_groups <- group_by(rwq, citric.acid)
+
+rwq.quality_by_citric_acid <- summarise(citric_acid_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(citric.acid,mean_quality), 
+       data = rwq.quality_by_citric_acid) + 
+  geom_point() + geom_smooth()
+```
+
+With citric acid, there is a positive linear relationship but it is not very strong. There is a very gradual increase in quality with increase in citric acid. The data does look more scattered in positive and negative directions as the citric acid increases but we see more data points on the positive side.
+
+## Grouping chlorides values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+##Remove outliers before transforming data
+rwq_chlorides_without_outlier <- subset(rwq,log10(chlorides) < 0.2)
+chloride_groups <- group_by(rwq_chlorides_without_outlier, chlorides)
+
+rwq.quality_by_chloride <- summarise(chloride_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(chlorides,mean_quality), 
+       data = subset(rwq.quality_by_chloride,chlorides < 0.2)) + 
+       geom_point() + geom_smooth()
+```
+
+With chlorides, there is a negative linear relationship but it is not very strong. There is a very gradual dip in quality with increase in chloride content. Like citric acid the data does look more scattered in positive and negative directions as the citric acid increases but we see more data points on the positive side. So I feel like it kind of stabilises beyond a point. The quality between 5 and 6 becomes more consistent.
+
+## Grouping sulphates values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+##Remove outliers before transforming data
+rwq_sulphates_without_outlier <- subset(rwq,sulphates < 1.25)
+sulphate_groups <- group_by(rwq_sulphates_without_outlier, sulphates)
+
+rwq.quality_by_sulphates <- summarise(sulphate_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(sulphates,mean_quality), data = rwq.quality_by_sulphates) + 
+  geom_point() + geom_smooth()
+```
+
+With sulphates, there is a positive linear relationship with quality. There is a constant increase in quality till the sulphate value increases upto 0.9 and then the data scatters. We have almost equal number of data points in both directions and cannot say much about the quality increase/decrease once the sulphate value goes beyond 1.
+
+## Grouping pH values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+ph_groups <- group_by(rwq, pH)
+
+rwq.quality_by_ph <- summarise(ph_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(pH,mean_quality), data = rwq.quality_by_ph) + 
+  geom_point() + geom_smooth()
+```
+
+As seen with pH in the set of graphs earlier, there is no trend as such seen with quality. Majority of the values seem to be seen within the 5 and 6 quality range.
+
+## Grouping density values to see the relation between their mean and quality of wine
+
+```{r echo=FALSE}
+ph_groups <- group_by(rwq, density)
+
+rwq.quality_by_density <- summarise(ph_groups,
+                                mean_quality = mean(quality),
+                                median_quality = median(quality),
+                                n = n())
+ggplot(aes(density,mean_quality), data = rwq.quality_by_density) + 
+  geom_point() + geom_smooth()
+```
+
+As seen with density in the set of graphs earlier, there is a slight decrease in quality with increase in density of wine. It was not very strongly visible in the earlier graph but the multiple dat points in this graph show a gradual decrease in quality with increase in density. Even though a large chunk of values are between 5 and 6 range, there are data points with lower density values which have high quality. That does not exist in case of higher density values.
+
+## Correlation coefficients between quality and other characteristics of the wine
+
+```{r echo=FALSE}
+cor.test(rwq$quality, rwq$alcohol, method = 'pearson')
+cor.test(rwq$quality, rwq$residual.sugar, method = 'pearson')
+cor.test(rwq$quality, rwq$fixed.acidity, method = 'pearson')
+cor.test(rwq$quality, rwq$citric.acid, method = 'pearson')
+cor.test(rwq$quality, rwq$chlorides, method = 'pearson')
+cor.test(rwq$quality, rwq$sulphates, method = 'pearson')
+cor.test(rwq$quality, rwq$total.sulfur.dioxide, method = 'pearson')
+cor.test(rwq$quality, rwq$free.sulfur.dioxide, method = 'pearson')
+cor.test(rwq$quality, rwq$pH, method = 'pearson')
+cor.test(rwq$quality, rwq$density, method = 'pearson')
+```
+
+Not surprisingly, alcohol seems to have the highest correlation coefficient with quality. 
+
+Since alcohol has a moderate linear relationship with the quality of the wine(highest among other characteristics), I think I should study the relation between alcohol and the other chemical properties of wine to see if there are any interesting trends.
+
+First I wish to look at how alcohol values are distributed.
+
+```{r echo=FALSE}
+qplot(x = alcohol, data = subset(rwq,!is.na(alcohol)), binwidth = 0.1,
+      xlab = 'Amount of alcohol',
+      ylab = 'Number of samples') +
+  scale_x_continuous(breaks = seq(9,14,0.5), lim = c(9,14))
+```
+
+I will then rule out pH(-0.0577), free.sulfur.dioxide(-0.0506), residual.sugar(0.0137) for my study of relationship with alcohol, because they have really low correlation coefficients with quality and now not important to me. I will compare the rest of them with alcohol to see if there are any relations I can find here.
+
+## Study of relationship between alcohol content in wine and other chemical characteristics
+
+## Create a big table grouping by alcohol and medians of all other columns
+```{r echo=FALSE}
+rwq.other_characteristics_by_alcohol <- rwq %>%
+  group_by(alcohol) %>%
+  summarize(mean_fixed_acidity = mean(fixed.acidity),
+  median_fixed_acidity = median(fixed.acidity),
+  mean_volatile_acidity = mean(volatile.acidity),
+  median_volatile_acidity = median(volatile.acidity),
+  mean_citric_acid = mean(citric.acid),
+  median_citric_acid = median(citric.acid),
+  mean_chlorides = mean(chlorides),
+  median_chlorides = median(chlorides),
+  mean_total_sulfure_dioxide = mean(total.sulfur.dioxide),
+  median_total_sulfure_dioxide = median(total.sulfur.dioxide),
+  mean_density = mean(density),
+  median_density = median(density),
+  mean_sulphates = mean(sulphates),
+  median_sulpahtes = median(sulphates),
+  n = n()) %>%
+  ungroup()
+```
+
+## Median fixed acidity with alcohol
+
+```{r echo=FALSE}
+ggplot(aes(median_fixed_acidity,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+       scale_x_continuous(breaks = seq(5,10,1), lim = c(5,10)) +
+  labs(x = "Fixed Acidity", y = "Alcohol")
+```
+
+The relationship between fixed acidity and alcohol is not linear. There seems to be a gradual increase in fixed acidity with decrease in alcohol but it is not very obvious. Its not right to conclude that they have a linear relationship.
+
+## Median volatile acidity with alcohol
+
+```{r echo=FALSE}
+ggplot(aes(median_volatile_acidity,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+  labs(x = "Volatile Acidity", y = "Alcohol")
+```
+
+The data points are extremely scattered to derive any relationship between volatile acidity and alcohol.
+
+## Median citric acid with alcohol
+
+```{r echo=FALSE}
+ggplot(aes(median_citric_acid,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+  labs(x = "Citric Acid", y = "Alcohol")
+```
+
+There seems to be a very gradual increase in citric acid with increase in alcohol even though there is an initial dip in citric acid. Overall, the relationship is not very clear.
+
+## Median chlorides with alcohol
+
+```{r echo=FALSE}
+ggplot(aes(median_chlorides,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+       scale_x_continuous(breaks = seq(0.04,0.2,0.02), lim = c(0.04,0.2)) +
+  labs(x = "Chlorides", y = "Alcohol")
+```
+
+This is interesting. Majority of the data points show a dip in alcohol amount with increase in chloride amount. So this is a negative linear relationship I see here.
+
+## Median fixed acidity with alcohol
+
+```{r echo=FALSE}
+ggplot(aes(median_total_sulfure_dioxide,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+       scale_x_continuous(breaks = seq(0,100,10), lim = c(0,100)) +
+  labs(x = "Total Sulfur Dioxide", y = "Alcohol")
+```
+
+The data points are extremely scattered to derive any relationship between total sulfur dioxide and alcohol.
+
+```{r echo=FALSE}
+ggplot(aes(median_density,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+  labs(x = "Density", y = "Alcohol")
+```
+
+This is interesting too. Majority of the data points show a dip in alcohol amount with increase in density of wine. So this is a negative linear relationship I see here.
+
+```{r echo=FALSE}
+ggplot(aes(median_sulpahtes,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+       scale_x_continuous(breaks = seq(0.3,0.8,0.1), lim = c(0.3,0.8)) +
+  labs(x = "Sulphates", y = "Alcohol")
+```
+
+There is a gradual increase in sulphate amount with increase in alcohol but it is not very strong. So it is hard to say that there is a relationship here.
+
+I did the above study because I thought that if some characteristic has a strong relation with alcohol, it is indirectly related to the quality of the wine too.
+
+Chlorides and density are the only 2 characteristics which seem strongly related to alcohol content of wine. They both show a negative linear relationship. Chlorides is something we did discover earlier having a relationship with quality. Now we have density too which we can say that, as the density of the wine decreases, the quality of the wine increases.
+
+## Plotting other characteristics versus alcohol in a different way
+
+```{r echo=FALSE}
+ggplot(aes(alcohol,citric.acid), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,residual.sugar), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,fixed.acidity), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,volatile.acidity), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,chlorides), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,total.sulfur.dioxide), data = rwq) + 
+  geom_point(alpha = 1/10)
+ggplot(aes(alcohol,sulphates), data = rwq) + 
+  geom_point(alpha = 1/10)
+```
+
+The above plots do not give me any helpful information. The data is very noisy and scattered and is hard to deduce anything here.
+
+## Plotting multiple(more than 2) variables
+
+Now I wish to see how the data looks when I plot 3 varaibles together. To begin with, I would like to choose quality and alcohol to be present all the time and I will change the third variable. I will also try to incorporate the removal of the required outliers.
+
+```{r echo=FALSE}
+library(dplyr)
+
+rwq.quality_by_alc_res_sugar <- subset(rwq,residual.sugar < 5)
+rwq.quality_by_alc_res_sugar <- rwq.quality_by_alc_res_sugar %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_residual_sugar = mean(residual.sugar),
+            median_residual_sugar = median(residual.sugar),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_residual_sugar, y = alcohol),
+       data = rwq.quality_by_alc_res_sugar) +
+       geom_point(aes(color = factor(quality)))
+```
+
+As seen in my earlier findings, residual sugar does not show any sort of trend with wine quality or its alcohol content. And so happened this time as well. The data points are scattered throughout the plot giving me nothing to conclude.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_fixd_acidity <- subset(rwq,fixed.acidity < 13)
+rwq.quality_by_alc_fixd_acidity <- rwq.quality_by_alc_fixd_acidity %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_fixd_acidity = mean(fixed.acidity),
+            median_fixd_acidity = median(fixed.acidity),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_fixd_acidity, y = alcohol),
+       data = rwq.quality_by_alc_fixd_acidity) +
+       geom_point(aes(color = factor(quality)))
+```
+
+This is an easy plot to read, majority of the data points say that, with increase in percentage of alcohol and increase in the fixed acidity of the wine, the quality seems to be getting better. 
+
+```{r echo=FALSE}
+rwq.quality_by_alc_vol_acidity <- rwq %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_vol_acidity = mean(volatile.acidity),
+            median_vol_acidity = median(volatile.acidity),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_vol_acidity, y = alcohol),
+       data = rwq.quality_by_alc_vol_acidity) +
+       geom_point(aes(color = factor(quality)))
+```
+
+This is an easy plot to read too, most of the data points show the turquiose, blue and pink spots(better wine quality) are concentrated on the left and upper side of the plot saying that lesser volatile acidity and higher alcohol percentage favours the quality of wine. As the volatile acidity increases the quality of the wine gradually decreases and is so evident from this graph. It is also associated with lower percentages of alcohol.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_citric_acid <- rwq %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_citric_acid = mean(citric.acid),
+            median_citric_acid = median(citric.acid),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_citric_acid, y = alcohol),
+       data = rwq.quality_by_alc_citric_acid) +
+       geom_point(aes(color = factor(quality)))
+```
+
+Here, the data points show the turquiose, blue and pink spots(better wine quality) are concentrated on the right and upper side of the plot saying that higher citric acid and alcohol percentage give better wine quality. The left lower side of the graph has majority of the data points showing lower wine quality and they are associated with lesser alcohol percentage and citric acid content.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_sulphates <- subset(rwq,sulphates < 1.25)
+rwq.quality_by_alc_sulphates <- rwq.quality_by_alc_sulphates %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_sulphates = mean(sulphates),
+            median_sulphates = median(sulphates),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_sulphates, y = alcohol),
+       data = rwq.quality_by_alc_sulphates) +
+       geom_point(aes(color = factor(quality)))
+```
+
+Here, the data points show the turquiose, blue and pink spots(better wine quality) are concentrated on the right and upper side of the plot saying that hisher sulphate and alcohol percentage give better wine quality. The left lower side of the graph has majority of the data points showing lower wine quality and they are associated with lesser alcohol percentage and sulphate content.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_chlorides <- subset(rwq,chlorides < 0.2)
+rwq.quality_by_alc_chlorides <- rwq.quality_by_alc_chlorides %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_chlorides = mean(chlorides),
+            median_chlorides = median(chlorides),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_chlorides, y = alcohol),
+       data = rwq.quality_by_alc_chlorides) +
+       geom_point(aes(color = factor(quality)))
+```
+
+The data here is slightly noisy. There is a very light trend and we can say that this relationship is not very strong. Lower chloride content and higher alcohol percentage is showing better quality is quite a few cases but not most and so is the opposite.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_free_sulf_dioxide <- subset(rwq,free.sulfur.dioxide < 50)
+rwq.quality_by_alc_free_sulf_dioxide <- 
+  rwq.quality_by_alc_free_sulf_dioxide %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_free_sulf_dioxide = mean(free.sulfur.dioxide),
+            median_free_sulf_dioxide = median(free.sulfur.dioxide),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_free_sulf_dioxide, y = alcohol),
+       data = rwq.quality_by_alc_free_sulf_dioxide) +
+       geom_point(aes(color = factor(quality)))
+```
+
+As seen in my earlier findings, free sulfur dioxide does not show any sort of trend with wine quality or its alcohol content. And so happened this time as well. The data points are scattered throughout the plot giving me nothing to conclude.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_total_sulf_dioxide <- subset(rwq,total.sulfur.dioxide < 150)
+rwq.quality_by_alc_total_sulf_dioxide <- 
+  rwq.quality_by_alc_total_sulf_dioxide %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_total_sulf_dioxide = mean(total.sulfur.dioxide),
+            median_total_sulf_dioxide = median(total.sulfur.dioxide),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_total_sulf_dioxide, y = alcohol),
+       data = rwq.quality_by_alc_total_sulf_dioxide) +
+       geom_point(aes(color = factor(quality)))
+```
+
+As seen in my earlier findings, total sulfur dioxide does not show any sort of trend with wine quality or its alcohol content. And so happened this time as well. The data points are scattered throughout the plot giving me nothing to conclude.
+
+```{r echo=FALSE}
+rwq.quality_by_alc_ph <- rwq %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_ph = mean(pH),
+            median_ph = median(pH),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_ph, y = alcohol),
+       data = rwq.quality_by_alc_ph) +
+       geom_point(aes(color = factor(quality)))
+```
+
+This data looks most interesting. pH data did not stand out so far with alochol or wine quality. But when all 3 were put together, there seems to be a trend. If a line were to be drawn from the left bottom of the plot to the top right of the plot, the data points will look quite divided in these 2 sections. The upper part contains data points with higher wine quality and the lower part contains data points with lower wine quality.
+
+## Final Plots and Summary
+
+## 1.Grouping alcohol values by quality
+
+```{r echo=FALSE}
+rwq.alcohol_by_quality <- rwq %>%
+  group_by(quality) %>%
+  summarize(
+  median_alcohol = median(alcohol),
+  n = n()) %>%
+  ungroup()
+
+ggplot(aes(median_alcohol,quality), 
+      data = rwq.alcohol_by_quality) + 
+      geom_point() + geom_smooth() +
+      scale_y_continuous(lim = c(3,8), breaks = seq(3,8,1)) +
+      labs(x = "Alcohol(%)", y = "Quality") +
+      ggtitle("Median Alcohol Percentage vs. Wine Quality")
+```
+
+The characteristic of wine that impacts its quality the most is the percentage of alcohol. There is a constant increase in quality with increase in its percentage of alcohol. They have a strong positive relationship.
+
+## 2.Study of relationship between alcohol content in wine and other chemical characteristics
+
+As shown above, alcohol has the strongest relationship with wine quality. Along with alcohol, I also derived that other characteristics like fixed.acidity, volatile.acidity, citric.acid and sulphates had a linear relationship too with wine quality but not as strong as the percentage of alcohol. The other characteristics did not showing anything interesting, so I decided to plot alcohol data with the other characteristics, and see if there could be an indirect connection.
+
+```{r echo=FALSE}
+rwq.other_characteristics_by_alcohol <- rwq %>%
+  group_by(alcohol) %>%
+  summarize(
+  median_density = median(density),
+  median_chlorides = median(chlorides),
+  n = n()) %>%
+  ungroup()
+
+ggplot(aes(median_density,alcohol), 
+       data = rwq.other_characteristics_by_alcohol) + 
+       geom_point() + geom_smooth() +
+       labs(x = "Density(mg / dm^3)", y = "Alcohol(%)") +
+       ggtitle("Median Density of Wine vs. Percentage of Alcohol in Wine")
+```
+
+Chlorides seems to be strongly related to alcohol content of wine. They have a negative linear relationship. Chlorides was not showing an obvious trend with wine quality, but since it has this negative linear relationship with percentage of alcohol, I can conclude that it would have a negative linear relationship with wine quality too(as percentage of alcohol as a poistive linear relationship with wine quality).
+
+## 3.Plotting multiple(more than 2) variables
+
+I plotted more than 2 variables this time. But I kept percentage of alcohol and wine quality constant. I studied all the other characteristics with these 2 variables to see what came up that was different from the findings I made earlier.
+
+```{r echo=FALSE}
+library(dplyr)
+
+rwq.quality_by_alc_ph <- rwq %>%
+  group_by(alcohol,quality) %>%
+  summarise(mean_ph = mean(pH),
+            median_ph = median(pH),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(alcohol)
+
+ggplot(aes(x = median_ph, y = alcohol),
+       data = rwq.quality_by_alc_ph) +
+       geom_point(aes(color = factor(quality))) + geom_smooth() +
+       labs(x = "Median pH values", y = "Alcohol(%)") +
+       ggtitle("Median pH values vs. Percentage of Alcohol in Wine")
+```
+
+The most interesting finding was that of the relationship with pH. pH so far, did not come close to showing any trend with wine quality or percentage of alcohol. But when I plotted it with both of them in picture, it showed some relationship. In the above graph, majority of the points above the line belong to a higher quality category and majority of the points below the line belong to a lower quality category. It looks like lesser values of ph and higher values of alcohol percentage show better wine quality and higher values of ph with lower values of alcohol percentage show lesser values of wine quality.
+
+## REFLECTION
+
+I have studied red wine data to some extent where I felt that I understood red wine a lot better now although there is scope for a lot more exploration here.
+
+My primary focus was on the quality of red wine and how the other properties of wine played a role in determining its quality. Quality did feel like the most important column in this data.
+
+Alcohol content is the column which showed a strong relationship to this data. However there were some other columns too which shared a relationship but not as strong. Some examples were columns like acidity, citric acid and sulphates. 
+
+If I had to further explore this data, I would like to analyse each of these chemical characteristics with one another.
+
+It was an interesting struggle for me in terms of thinking how to study this data beyond just the quality column. I think that adding data like types of red wine, countries of origin, types of grapes used etc, could make the study more interesting. I also did a lot of trials in choosing what columns to put on what axes and how to make the data look sensible. Overall, I felt like, the more time and thought I give, the more ideas I can come with to look at this data from different angles and come to different conclusions.
